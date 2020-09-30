@@ -23,11 +23,15 @@ function register(req, res) {
 function authenticate(req, res) {
     console.log(req.body)
     userService.authenticate(req.body)
-        .then(() => {
-            res.status(200).send({message: 'User is logged in!'});
+        .then((user) => {
+            res
+                .status(200)
+                .json({user, message: "Successful login.", hasErrors: false});
         })
         .catch((err) => {
-            res.json({message: err});
+            res
+                .status(400)
+                .json({message: err, hasErrors: true});
             console.log(err);
         })
 }

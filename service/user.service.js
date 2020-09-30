@@ -28,15 +28,16 @@ async function create(userParam) {
 
 async function authenticate({ email, password }) {
     const user = await User.findOne({ email });
-    if (user && bcrypt.compareSync(password, user.password)) {
+
+    if(!user) {
+        throw 'User with given e-mail is not registered.';
+    } else if(!bcrypt.compareSync(password, user.password)) {
+        throw 'Incorrect password.';
+    } else if (user && bcrypt.compareSync(password, user.password)) {
         const token = jwt.sign({ sub: user.id }, jwtConfig.secret, { expiresIn: '7d' });
         return {
             ...user.toJSON(),
             token
         };
-    } else if(!user) {
-        throw 'User with this email: "' + email + '" is not registered.';
-    } else if(!bcrypt.compareSync(password, user.password)) {
-        throw 'Incorrect password.';
     }
 }

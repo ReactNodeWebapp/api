@@ -1,3 +1,3 @@
 module.exports = {
-    url: process.env.JWT_SECRET
+    secret: process.env.JWT_SECRET
 };

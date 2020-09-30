@@ -1,11 +1,13 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const db = require('../_helpers/db');
+const jwtConfig = require('../config/jwt.config')
 const date = require('moment');
 const User = db.User;
 
 module.exports = {
-    create
+    create,
+    authenticate
 };
 
 async function create(userParam) {
@@ -22,4 +24,19 @@ async function create(userParam) {
     user.date = date().add(2, 'hours').format();
 
     await user.save();
+}
+
+async function authenticate({ email, password }) {
+    const user = await User.findOne({ email });
+    if (user && bcrypt.compareSync(password, user.password)) {
+        const token = jwt.sign({ sub: user.id }, jwtConfig.secret, { expiresIn: '7d' });
+        return {
+            ...user.toJSON(),
+            token
+        };
+    } else if(!user) {
+        throw 'User with this email: "' + email + '" is not registered.';
+    } else if(!bcrypt.compareSync(password, user.password)) {
+        throw 'Incorrect password.';
+    }
 }

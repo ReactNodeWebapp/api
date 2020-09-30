@@ -9,6 +9,7 @@ const connectionOptions = {
 mongoose
     .connect(process.env.DB_URI, connectionOptions)
     .then(console.log("DB connected!"))
+    .catch((err) => console.log(err));
 mongoose.Promise = global.Promise;
 
 module.exports = {

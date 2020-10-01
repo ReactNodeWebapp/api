@@ -12,7 +12,7 @@ module.exports = {
 
 async function create(userParam) {
     if (await User.findOne({ email: userParam.email })) {
-        throw 'User with this email: "' + userParam.email + '" already exists.';
+        throw 'ALREADY_EXISTING_USER';
     }
 
     const user = new User(userParam);
@@ -30,9 +30,9 @@ async function authenticate({ email, password }) {
     const user = await User.findOne({ email });
 
     if(!user) {
-        throw 'User with given e-mail is not registered.';
+        throw 'NOT_REGISTERED';
     } else if(!bcrypt.compareSync(password, user.password)) {
-        throw 'Incorrect password.';
+        throw 'BAD_CREDENTIAL';
     } else if (user && bcrypt.compareSync(password, user.password)) {
         const token = jwt.sign({ sub: user.id }, jwtConfig.secret, { expiresIn: '7d' });
         return {

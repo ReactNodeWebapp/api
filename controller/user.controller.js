@@ -8,31 +8,32 @@ router.post('/authentication', authenticate);
 
 module.exports = router;
 
-function register(req, res) {
+function register(req, res, next) {
     console.log(req.body)
     userService.create(req.body)
         .then(() => {
-            res.status(200).send({message: 'New user is successfully added to the database!'});
+            res.status(200).send({
+                message: 'New user is successfully added to the database.',
+                hasErrors: false
+            });
         })
         .catch(err => {
-            res.json({message: err});
-            console.log(err);
+            next(err);
         });
 }
 
-function authenticate(req, res) {
+function authenticate(req, res, next) {
     console.log(req.body)
     userService.authenticate(req.body)
         .then((user) => {
-            res
-                .status(200)
-                .json({user, message: "Successful login.", hasErrors: false});
+            res.status(200).json({
+                user,
+                message: "Successful login.",
+                hasErrors: false
+            });
         })
-        .catch((err) => {
-            res
-                .status(400)
-                .json({message: err, hasErrors: true});
-            console.log(err);
-        })
+        .catch(err => {
+            next(err);
+        });
 }
 

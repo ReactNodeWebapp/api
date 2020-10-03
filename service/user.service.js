@@ -35,8 +35,9 @@ async function authenticate({ email, password }) {
         throw 'BAD_CREDENTIAL';
     } else if (user && bcrypt.compareSync(password, user.password)) {
         const token = jwt.sign({ sub: user.id }, jwtConfig.secret, { expiresIn: '7d' });
+        user.date = date().add(2, 'hours').format();
         return {
-            ...user.toJSON(),
+            user,
             token
         };
     }

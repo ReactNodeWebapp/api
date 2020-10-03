@@ -4,7 +4,7 @@ function errorHandler(err, req, res, next) {
             return res
                 .status(401)
                 .json({
-                    message: 'User with given e-mail address is not registered.',
+                    message: 'Given e-mail address is not registered.',
                     hasErrors: true
                 });
         }

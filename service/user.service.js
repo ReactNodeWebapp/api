@@ -7,7 +7,9 @@ const User = db.User;
 
 module.exports = {
     create,
-    authenticate
+    authenticate,
+    getUserProfile,
+    checkJwtStatus
 };
 
 async function create(userParam) {
@@ -34,11 +36,47 @@ async function authenticate({ email, password }) {
     } else if(!bcrypt.compareSync(password, user.password)) {
         throw 'BAD_CREDENTIAL';
     } else if (user && bcrypt.compareSync(password, user.password)) {
-        const token = jwt.sign({ sub: user.id }, jwtConfig.secret, { expiresIn: '7d' });
+        const token = jwt.sign({ sub: user.id }, jwtConfig.secret, { expiresIn: 60 });
+
         user.date = date().add(2, 'hours').format();
+
         return {
             user,
             token
         };
+    }
+}
+
+async function getUserProfile(req) {
+    const token = req.cookies.token;
+    console.log('tu sam')
+    if (!token) {
+        throw 'NO_TOKEN';
+    }
+
+    try {
+        const decoded = jwt.verify(token, jwtConfig.secret);
+
+        return decoded;
+    } catch (err) {
+        throw 'EXPIRED_SESSION';
+    }
+}
+
+async function checkJwtStatus(req) {
+    const token = req.cookies.token;
+
+    if (!token) {
+        throw 'NO_TOKEN';
+    }
+
+    try {
+        const decoded = jwt.verify(token, jwtConfig.secret);
+
+        req.user = decoded;
+
+        return req.user;
+    } catch (err) {
+        throw 'EXPIRED_SESSION';
     }
 }

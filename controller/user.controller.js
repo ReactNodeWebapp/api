@@ -5,7 +5,9 @@ const userService = require('../service/user.service');
 // routes
 router.post('/registration', register);
 router.post('/authentication', authenticate);
-router.get('profile', getUserProfile)
+router.post('/profile', getUserProfile);
+router.get('/status', checkJwtStatus)
+router.post('/logout', logout);
 
 module.exports = router;
 
@@ -27,7 +29,6 @@ function register(req, res, next) {
 function authenticate(req, res, next) {
     userService.authenticate(req.body)
         .then((user) => {
-            console.log(user)
             res
                 .status(200)
                 .cookie("token", user.token, { httpOnly: true })
@@ -43,15 +44,35 @@ function authenticate(req, res, next) {
 }
 
 function getUserProfile(req, res, next) {
-    userService.authenticate(req.body)
+    userService.getUserProfile(req)
         .then((user) => {
-            console.log(user);
             res
                 .status(200)
-                .cookie("token", user.token, { httpOnly: true })
                 .json({
                     user,
-                    message: "Successful login.",
+                    message: "Successful authorization for getting user profile.",
+                    hasErrors: false
+                });
+        })
+        .catch(err => {
+            next(err);
+        });
+}
+
+function logout(req, res, next) {
+    res.clearCookie("token");
+    res.send({ success: true });
+}
+
+function checkJwtStatus(req, res, next) {
+    userService.checkJwtStatus(req)
+        .then((user) => {
+            res
+                .status(200)
+                .json({
+                    user,
+                    status: true,
+                    message: "Successful authorization.",
                     hasErrors: false
                 });
         })

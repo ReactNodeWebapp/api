@@ -9,7 +9,8 @@ module.exports = {
     create,
     authenticate,
     getUserProfile,
-    checkJwtStatus
+    checkJwtStatus,
+    update
 };
 
 async function create(userParam) {
@@ -36,7 +37,7 @@ async function authenticate({ email, password }) {
     } else if(!bcrypt.compareSync(password, user.password)) {
         throw 'BAD_CREDENTIAL';
     } else if (user && bcrypt.compareSync(password, user.password)) {
-        const token = jwt.sign({ sub: user.id }, jwtConfig.secret, { expiresIn: 60 });
+        const token = jwt.sign({ sub: user.id }, jwtConfig.secret, { expiresIn: 60*60 });
 
         user.date = date().add(2, 'hours').format();
 
@@ -49,7 +50,7 @@ async function authenticate({ email, password }) {
 
 async function getUserProfile(req) {
     const token = req.cookies.token;
-    console.log('tu sam')
+
     if (!token) {
         throw 'NO_TOKEN';
     }
@@ -61,6 +62,17 @@ async function getUserProfile(req) {
     } catch (err) {
         throw 'EXPIRED_SESSION';
     }
+}
+
+async function update(id, data) {
+    const user = await User.findById(id);
+
+    // MAKE THIS SO ONLY CHANGED DATA IS SAVED
+    Object.assign(user, data);
+
+    await user.save();
+
+    return user;
 }
 
 async function checkJwtStatus(req) {

@@ -8,6 +8,7 @@ router.post('/authentication', authenticate);
 router.post('/profile', getUserProfile);
 router.get('/status', checkJwtStatus)
 router.post('/logout', logout);
+router.put("/:id", update);
 
 module.exports = router;
 
@@ -79,5 +80,11 @@ function checkJwtStatus(req, res, next) {
         .catch(err => {
             next(err);
         });
+}
+
+function update(req, res, next) {
+    userService.update(req.params.id, req.body)
+        .then((user) => res.json(user))
+        .catch(err => next(err));
 }
 

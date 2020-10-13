@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userService = require('../service/user.service');
+const multer = require('multer');
 
 // routes
 router.post('/registration', register);
@@ -8,7 +9,9 @@ router.post('/authentication', authenticate);
 router.post('/profile', getUserProfile);
 router.get('/status', checkJwtStatus)
 router.post('/logout', logout);
-router.put("/:id", update);
+router.put('/:id', update);
+router.patch('/:id/image', () => console.log('tu sam'));
+router.get('/:id/image', getUserImage)
 
 module.exports = router;
 
@@ -16,7 +19,7 @@ function register(req, res, next) {
     userService.create(req.body)
         .then(() => {
             res
-                .status(200)
+                .status(201)
                 .send({
                     message: 'New user is successfully added to the database.',
                     hasErrors: false
@@ -84,7 +87,39 @@ function checkJwtStatus(req, res, next) {
 
 function update(req, res, next) {
     userService.update(req.params.id, req.body)
-        .then((user) => res.json(user))
+        .then((user) => {
+            res
+                .status(200)
+                .json(user);
+        })
         .catch(err => next(err));
 }
+
+function updateUserImage(req, res, next) {
+    userService.updateUserImage(req.params.id, req.body.data)
+        .then((imageUrl) => {
+            res
+                .status(200)
+                .json(imageUrl);
+        })
+        .catch(err => {
+            console.log(err)
+            next(err);
+        });
+}
+
+function getUserImage(req, res, next) {
+    userService.getUserImage(req.params.id)
+        .then((imageUrl) => {
+            res
+                .status(200)
+                .json(imageUrl);
+        })
+        .catch(err => {
+            console.log(err)
+            next(err);
+        });
+}
+
+
 

@@ -29,6 +29,10 @@ const userSchema = new Schema(
         telephoneNumber: {
             type: String,
             required: false
+        },
+        userImageUrl: {
+            type: String,
+            required: false
         }
     }
 );

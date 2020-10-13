@@ -3,14 +3,26 @@ const bcrypt = require('bcrypt');
 const db = require('../_helpers/db');
 const jwtConfig = require('../config/jwt.config')
 const date = require('moment');
+const cloudinary = require('cloudinary').v2
+const streamifier = require('streamifier')
+const multer = require('multer');
 const User = db.User;
+
+// cloudinary config
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 module.exports = {
     create,
     authenticate,
     getUserProfile,
     checkJwtStatus,
-    update
+    update,
+    updateUserImage,
+    getUserImage
 };
 
 async function create(userParam) {
@@ -73,6 +85,25 @@ async function update(id, data) {
     await user.save();
 
     return user;
+}
+
+async function updateUserImage(id, image) {
+    const response = await cloudinary.uploader.upload(image, {
+        upload_preset: 'ml_default'
+    });
+
+    const user = await User.findById(id);
+    user.userImageUrl = response.secure_url;
+
+    await user.save();
+
+    return user.userImageUrl;
+}
+
+async function getUserImage(id) {
+    const user = await User.findById(id);
+
+    return user.userImageUrl;
 }
 
 async function checkJwtStatus(req) {

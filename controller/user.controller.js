@@ -10,7 +10,7 @@ router.post('/profile', getUserProfile);
 router.get('/status', checkJwtStatus)
 router.post('/logout', logout);
 router.put('/:id', update);
-router.patch('/:id/image', () => console.log('tu sam'));
+router.post('/:id/image', updateUserImage);
 router.get('/:id/image', getUserImage)
 
 module.exports = router;

@@ -3,9 +3,7 @@ const bcrypt = require('bcrypt');
 const db = require('../_helpers/db');
 const jwtConfig = require('../config/jwt.config')
 const date = require('moment');
-const cloudinary = require('cloudinary').v2
-const streamifier = require('streamifier')
-const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
 const User = db.User;
 
 // cloudinary config
